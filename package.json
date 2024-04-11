@@ -1,0 +1,13 @@
+{
+  "name": "com.onewing.beanshootout-customlevels",
+  "version": "0.0.1",
+  "displayName": "Bean Shootout Custom Level Package",
+  "description": "The Great Bean Shootout Custom Levels Package",
+  "unity": "2022.3",
+  "unityRelease": "20f1",
+  "dependencies": {
+    "com.unity.render-pipelines.universal": "14.0.10",
+    "com.unity.inputsystem": "1.7.0",
+    "com.unity.nuget.newtonsoft-json": "3.2.1"
+  }
+}

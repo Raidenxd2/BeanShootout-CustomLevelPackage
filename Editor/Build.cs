@@ -37,22 +37,7 @@ public class Build : EditorWindow
             Directory.CreateDirectory("Assets/Levels/" + SceneName + "/WindowsBuild");
             AssetDatabase.Refresh();
 
-            switch (ct)
-            {
-                case CompressionType.None:
-                    BuildPipeline.BuildAssetBundles("Assets/Levels/" + SceneName + "/WindowsBuild", BuildAssetBundleOptions.UncompressedAssetBundle, BuildTarget.StandaloneWindows64);
-                    break;
-
-                case CompressionType.LZ4:
-                    BuildPipeline.BuildAssetBundles("Assets/Levels/" + SceneName + "/WindowsBuild", BuildAssetBundleOptions.ChunkBasedCompression, BuildTarget.StandaloneWindows64);
-                    break;
-
-                case CompressionType.LZMA:
-                    BuildPipeline.BuildAssetBundles("Assets/Levels/" + SceneName + "/WindowsBuild", BuildAssetBundleOptions.None, BuildTarget.StandaloneWindows64);
-                    break;
-            }
-
-            AssetDatabase.Refresh();
+            BuildAssetBundle(ct, BuildTarget.StandaloneWindows64, SceneName);
 
             File.Move("Assets/Levels/" + SceneName + "/WindowsBuild/" + SceneName.ToLower() + "_ab", "Assets/Levels/" + SceneName + "/level");
             AssetDatabase.Refresh();
@@ -70,6 +55,26 @@ public class Build : EditorWindow
             
             EditorUtility.DisplayDialog("Message", "Build created under Assets/Levels/" + SceneName + "/WindowsBuild/level", "OK");
         }
+    }
+
+    private void BuildAssetBundle(CompressionType ct, BuildTarget target, string SceneName)
+    {
+        switch (ct)
+        {
+            case CompressionType.None:
+                BuildPipeline.BuildAssetBundles("Assets/Levels/" + SceneName + "/WindowsBuild", BuildAssetBundleOptions.UncompressedAssetBundle, target);
+                break;
+
+            case CompressionType.LZ4:
+                BuildPipeline.BuildAssetBundles("Assets/Levels/" + SceneName + "/WindowsBuild", BuildAssetBundleOptions.ChunkBasedCompression, target);
+                break;
+
+            case CompressionType.LZMA:
+                BuildPipeline.BuildAssetBundles("Assets/Levels/" + SceneName + "/WindowsBuild", BuildAssetBundleOptions.None, target);
+                break;
+        }
+
+        AssetDatabase.Refresh();
     }
 }
 

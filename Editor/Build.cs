@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Build : EditorWindow
 {
-    CompressionType ct = CompressionType.LZ4;
+    CompressionType ct = CompressionType.LZMA;
 
     [MenuItem("Bean Shootout/Build Level")]
     public static void ShowWindow()

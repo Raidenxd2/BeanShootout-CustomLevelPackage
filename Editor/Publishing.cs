@@ -37,7 +37,7 @@ public class Publishing : EditorWindow
 
             AssetDatabase.Refresh();
 
-            EditorUtility.DisplayDialog("Message", "Created Zip file under Assets/Levels/" + SceneName + "/WindowsBuild/" + SceneName + "-win64.zip", "OK");
+            EditorUtility.DisplayDialog("Message", "Created Zip file under 'Assets/Levels/" + SceneName + "/WindowsBuild/" + SceneName + "-win64.zip'", "OK");
 
             EditorUtility.ClearProgressBar();
         }
@@ -62,7 +62,7 @@ public class Publishing : EditorWindow
 
             AssetDatabase.Refresh();
 
-            EditorUtility.DisplayDialog("Message", "Created Zip file under Assets/Levels/" + SceneName + "/MacBuild/" + SceneName + "-mac.zip", "OK");
+            EditorUtility.DisplayDialog("Message", "Created Zip file under 'Assets/Levels/" + SceneName + "/MacBuild/" + SceneName + "-mac.zip'", "OK");
 
             EditorUtility.ClearProgressBar();
         }
@@ -87,7 +87,7 @@ public class Publishing : EditorWindow
 
             AssetDatabase.Refresh();
 
-            EditorUtility.DisplayDialog("Message", "Created Zip file under Assets/Levels/" + SceneName + "/LinuxBuild/" + SceneName + "-linux.zip", "OK");
+            EditorUtility.DisplayDialog("Message", "Created Zip file under 'Assets/Levels/" + SceneName + "/LinuxBuild/" + SceneName + "-linux.zip'", "OK");
 
             EditorUtility.ClearProgressBar();
         }
@@ -112,7 +112,7 @@ public class Publishing : EditorWindow
 
             AssetDatabase.Refresh();
 
-            EditorUtility.DisplayDialog("Message", "Created Zip file under Assets/Levels/" + SceneName + "/AndroidBuild/" + SceneName + "-android.zip", "OK");
+            EditorUtility.DisplayDialog("Message", "Created Zip file under 'Assets/Levels/" + SceneName + "/AndroidBuild/" + SceneName + "-android.zip'", "OK");
 
             EditorUtility.ClearProgressBar();
         }

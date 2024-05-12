@@ -23,13 +23,13 @@ public class Setup : EditorWindow
 
     private void OnGUI()
     {
-        GUILayout.Label("This seems to be your first time using this package. In order to properly use this package, you must setup your project for it. Press the Setup button to setup your project", EditorStyles.wordWrappedLabel);
+        GUILayout.Label("This seems to be your first time using this package. In order to properly use this package, you must setup your project for it. Press the 'Setup/Update' button to setup your project", EditorStyles.wordWrappedLabel);
 
-        if (GUILayout.Button("Setup"))
+        if (GUILayout.Button("Setup/Update"))
         {
             if (EditorUtility.DisplayDialog("Question", "Are you sure you want to setup your project for this package? WARNING: This will overwrite most Project Settings and the Editor will restart.", "Yes", "No"))
             {
-                EditorUtility.DisplayProgressBar("Bean Shootout Custom Level Package", "Setting up...", 0);
+                EditorUtility.DisplayProgressBar("The Great Bean Shootout Custom Level Package", "Setting up...", 0);
                 
                 Directory.CreateDirectory("Assets/Levels");
 
@@ -42,6 +42,8 @@ public class Setup : EditorWindow
                 File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/TimeManager.asset", Application.dataPath + "/../ProjectSettings/TimeManager.asset", true);
                 File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/URPProjectSettings.asset", Application.dataPath + "/../ProjectSettings/URPProjectSettings.asset", true);
                 File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/QualitySettings.asset", Application.dataPath + "/../ProjectSettings/QualitySettings.asset", true);
+
+                File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/UniversalRenderPipelineGlobalSettings.asset~", Application.dataPath + "/UniversalRenderPipelineGlobalSettings.asset", true);
 
                 EditorUtility.DisplayDialog("Message", "If a dialog says something about the Input System, press Yes on it.", "OK");
 

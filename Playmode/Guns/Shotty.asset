@@ -16,4 +16,9 @@ MonoBehaviour:
   Image: {fileID: 21300000, guid: 0c0e5cd708a637540b67700f1beae04b, type: 3}
   AmountOfBulletsToShoot: 3
   BulletsThatAreUsed: 3
-  Damage: 10
+  Damage: 24
+  HoldToShoot: 0
+  Delay: 0.7
+  ShootBackwards: 0
+  RecoilSpeed: 3
+  RecoilRot: {x: 0, y: 0, z: 25}

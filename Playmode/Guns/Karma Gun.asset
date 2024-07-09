@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GunName: Karma Gun
   Image: {fileID: 21300000, guid: 429f6afcce77c2b4694d8aef6b903efb, type: 3}
-  AmountOfBulletsToShoot: 4
-  BulletsThatAreUsed: 4
-  Damage: 25
-  HoldToShoot: 0
-  Delay: 0
+  AmountOfBulletsToShoot: 1
+  BulletsThatAreUsed: 6
+  Damage: 50
+  HoldToShoot: 1
+  Delay: 3
   ShootBackwards: 1
   RecoilSpeed: 3
   RecoilRot: {x: 0, y: 0, z: -25}

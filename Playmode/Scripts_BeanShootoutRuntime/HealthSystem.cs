@@ -19,6 +19,8 @@ namespace KillItMyself.Runtime
 
         [SerializeField] private LayerMask layerMask;
 
+        private Rigidbody playerRb;
+
         private bool Dead;
         
         private PlayerMovement playerMovement;
@@ -29,6 +31,8 @@ namespace KillItMyself.Runtime
         private void Awake()
         {
             playerMovement = GetComponent<PlayerMovement>();
+
+            playerRb = playerMovement.GetComponent<Rigidbody>();
         }
 
         private void Update()
@@ -47,7 +51,9 @@ namespace KillItMyself.Runtime
 
                 Dead = true;
                 
-                playerMovement.GetComponent<Rigidbody>().AddForce(new Vector3(0, playerMovement.transform.position.y + 3, 0), ForceMode.Force);
+                playerRb.linearVelocity = Vector3.zero;
+
+                playerRb.position += new Vector3(0, 0.25f, 0);
             }
 
             if (Dead)

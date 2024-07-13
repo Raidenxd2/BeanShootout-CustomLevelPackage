@@ -16,7 +16,8 @@ public class Build : EditorWindow
 
     private void OnGUI()
     {
-        ct = (CompressionType)EditorGUI.EnumPopup(new Rect(3, 3, position.width - 6, 15), new GUIContent("Compression Type"), ct);
+        
+        ct = (CompressionType)EditorGUI.EnumPopup(new Rect(3, 3, position.width - 6, 15), new GUIContent("Compression Type", "None: Fastest to load, biggest file size\nLZ4: Fast to load, medium file size\nLZMA (Default): Slowest to load, smallest file size"), ct);
 
         GUILayout.Space(50);
 

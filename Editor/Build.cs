@@ -1,8 +1,11 @@
+using System;
+using System.Diagnostics;
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
+using Debug = UnityEngine.Debug;
 public class Build : EditorWindow
 {
     CompressionType ct = CompressionType.LZMA;
@@ -58,7 +61,13 @@ public class Build : EditorWindow
 
         if (GUILayout.Button("Build and run for Windows x64"))
         {
-            
+            BeanShootoutConfigSO config = AssetDatabase.LoadAssetAtPath<BeanShootoutConfigSO>("Assets/BeanShootoutConfig.asset");
+
+            if (string.IsNullOrEmpty(config.GamePath))
+            {
+                EditorUtility.DisplayDialog("Error", "Please set a game path in the config!", "OK");
+                return;
+            }
 
             Debug.Log("(BeanShootout) Building level");
 
@@ -90,6 +99,18 @@ public class Build : EditorWindow
             AssetDatabase.Refresh();
 
             Debug.Log("(BeanShootout) Running level");
+
+            string LevelLocalBuildFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "OneWing", "The Great Bean Shootout", "Mods", "LevelLocalBuild") + "\\";
+            Debug.Log("(BeanShootout) LevelLocalBuildFolder: "+ LevelLocalBuildFolder);
+
+            File.Copy("Assets/Levels/" + SceneName + "/WindowsBuild/level", LevelLocalBuildFolder + "level", true);
+            File.Copy("Assets/Levels/" + SceneName + "/WindowsBuild/image.png", LevelLocalBuildFolder + "image.png", true);
+            File.Copy("Assets/Levels/" + SceneName + "/WindowsBuild/name.txt", LevelLocalBuildFolder + "name.txt", true);
+
+            Process GameProcess = new();
+            GameProcess.StartInfo.FileName = config.GamePath + "/BeanShootout.exe";
+            GameProcess.StartInfo.Arguments = "-loadlevellocalbuild";
+            GameProcess.Start();
         }
 
         if (GUILayout.Button("Build for Mac"))

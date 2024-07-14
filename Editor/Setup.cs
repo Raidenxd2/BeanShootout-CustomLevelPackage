@@ -1,5 +1,4 @@
 using System.IO;
-using TMPro;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,9 +9,14 @@ public class Setup : EditorWindow
     {
         Debug.Log("(BeanShootout) Startup");
 
-        if (!File.Exists(Application.dataPath + "/DO_NOT_DELETE_THIS_BeanShootout"))
+        if (!File.Exists("Assets/DO_NOT_DELETE_THIS_BeanShootout"))
         {
             ShowWindow();
+        }
+
+        if (!File.Exists("Assets/BeanShootoutConfig.asset"))
+        {
+            CreateConfig();
         }
     }
 
@@ -53,5 +57,14 @@ public class Setup : EditorWindow
                 EditorApplication.OpenProject(Directory.GetCurrentDirectory());
             }
         }
+    }
+
+    public static void CreateConfig()
+    {
+        Debug.Log("(BeanShootout) Creating config");
+        BeanShootoutConfigSO config = ScriptableObject.CreateInstance<BeanShootoutConfigSO>();
+
+        AssetDatabase.CreateAsset(config, "Assets/BeanShootoutConfig.asset");
+        AssetDatabase.SaveAssets();
     }
 }

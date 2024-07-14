@@ -16,7 +16,6 @@ public class Build : EditorWindow
 
     private void OnGUI()
     {
-        
         ct = (CompressionType)EditorGUI.EnumPopup(new Rect(3, 3, position.width - 6, 15), new GUIContent("Compression Type", "None: Fastest to load, biggest file size\nLZ4: Fast to load, medium file size\nLZMA (Default): Slowest to load, smallest file size"), ct);
 
         GUILayout.Space(50);
@@ -55,6 +54,42 @@ public class Build : EditorWindow
             AssetDatabase.Refresh();
             
             EditorUtility.DisplayDialog("Message", "Build created under Assets/Levels/" + SceneName + "/WindowsBuild/level", "OK");
+        }
+
+        if (GUILayout.Button("Build and run for Windows x64"))
+        {
+            
+
+            Debug.Log("(BeanShootout) Building level");
+
+            string SceneName = EditorSceneManager.GetActiveScene().name;
+
+            if (Directory.Exists("Assets/Levels/" + SceneName + "/WindowsBuild"))
+            {
+                Directory.Delete("Assets/Levels/" + SceneName + "/WindowsBuild", true);
+                AssetDatabase.Refresh();
+            }
+
+            Directory.CreateDirectory("Assets/Levels/" + SceneName + "/WindowsBuild");
+            AssetDatabase.Refresh();
+
+            BuildAssetBundle(ct, BuildTarget.StandaloneWindows64, SceneName, "WindowsBuild");
+
+            File.Move("Assets/Levels/" + SceneName + "/WindowsBuild/" + SceneName.ToLower() + "_ab", "Assets/Levels/" + SceneName + "/level");
+            AssetDatabase.Refresh();
+
+            Directory.Delete("Assets/Levels/" + SceneName + "/WindowsBuild", true);
+            AssetDatabase.Refresh();
+
+            Directory.CreateDirectory("Assets/Levels/" + SceneName + "/WindowsBuild");
+            AssetDatabase.Refresh();
+
+            File.Move("Assets/Levels/" + SceneName + "/level", "Assets/Levels/" + SceneName + "/WindowsBuild/level");
+            File.Copy("Assets/Levels/" + SceneName + "/image.png", "Assets/Levels/" + SceneName + "/WindowsBuild/image.png");
+            File.Copy("Assets/Levels/" + SceneName + "/name.txt", "Assets/Levels/" + SceneName + "/WindowsBuild/name.txt");
+            AssetDatabase.Refresh();
+
+            Debug.Log("(BeanShootout) Running level");
         }
 
         if (GUILayout.Button("Build for Mac"))

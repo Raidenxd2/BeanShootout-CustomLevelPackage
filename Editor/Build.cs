@@ -59,13 +59,19 @@ public class Build : EditorWindow
             EditorUtility.DisplayDialog("Message", "Build created under Assets/Levels/" + SceneName + "/WindowsBuild/level", "OK");
         }
 
-        if (GUILayout.Button("Build and run for Windows x64"))
+        if (GUILayout.Button("Build and Run for Windows x64"))
         {
             BeanShootoutConfigSO config = AssetDatabase.LoadAssetAtPath<BeanShootoutConfigSO>("Assets/BeanShootoutConfig.asset");
 
             if (string.IsNullOrEmpty(config.GamePath))
             {
-                EditorUtility.DisplayDialog("Error", "Please set a game path in the config!", "OK");
+                EditorUtility.DisplayDialog("Error", "Please set a Game Path in the config!", "OK");
+                return;
+            }
+
+            if (!config.IsValid)
+            {
+                EditorUtility.DisplayDialog("Error", "Game Path isn't valid.\n" + config.ValidReason, "OK");
                 return;
             }
 

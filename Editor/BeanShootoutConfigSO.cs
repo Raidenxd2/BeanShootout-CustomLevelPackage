@@ -29,7 +29,13 @@ public class BeanShootoutConfigSO_Inspector : Editor
     {
         serializedObject.Update();
 
+        GUILayout.BeginHorizontal();
         EditorGUILayout.PropertyField(GamePath);
+        if (GUILayout.Button("...", GUILayout.Width(25)))
+        {
+            config.GamePath = EditorUtility.OpenFolderPanel("Select folder", "", "");
+        }
+        GUILayout.EndHorizontal();
 
         if (GUILayout.Button("Update"))
         {

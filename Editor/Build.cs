@@ -25,7 +25,7 @@ public class Build : EditorWindow
 
         GUILayout.Label("The built files will be under Assets/Levels/<LEVEL NAME>/Build/level");
 
-        if (GUILayout.Button("Build for Windows x64"))
+        if (GUILayout.Button("Build for Windows"))
         {
             Debug.Log("(BeanShootout) Building level");
 
@@ -59,7 +59,7 @@ public class Build : EditorWindow
             EditorUtility.DisplayDialog("Message", "Build created under Assets/Levels/" + SceneName + "/WindowsBuild/level", "OK");
         }
 
-        if (GUILayout.Button("Build and Run for Windows x64"))
+        if (GUILayout.Button("Build and Run for Windows"))
         {
             BeanShootoutConfigSO config = AssetDatabase.LoadAssetAtPath<BeanShootoutConfigSO>("Assets/BeanShootoutConfig.asset");
 
@@ -115,7 +115,7 @@ public class Build : EditorWindow
 
             Process GameProcess = new();
             GameProcess.StartInfo.FileName = config.GamePath + "/BeanShootout.exe";
-            GameProcess.StartInfo.Arguments = "-loadlevellocalbuild";
+            GameProcess.StartInfo.Arguments = "-loadlevellocalbuild -gs_fnop " + config.FullscreenWhenTheresNoOtherPlayers + " -gs_sm " + config.ShowMinimap + " -gs_ma " + config.MaxAmmo + " -ga_mp " + config.MaxPlayers;
             GameProcess.Start();
         }
 
@@ -153,7 +153,7 @@ public class Build : EditorWindow
             EditorUtility.DisplayDialog("Message", "Build created under Assets/Levels/" + SceneName + "/MacBuild/level", "OK");
         }
 
-        if (GUILayout.Button("Build for Linux x64"))
+        if (GUILayout.Button("Build for Linux"))
         {
             Debug.Log("(BeanShootout) Building level");
 

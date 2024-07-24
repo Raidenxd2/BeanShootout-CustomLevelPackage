@@ -1,4 +1,4 @@
-// https://forum.unity.com/threads/how-to-change-game-window-resoltuion-width-height-in-editor-mode-programmatically.1193257/#post-7631518
+// https://discussions.unity.com/t/how-to-change-game-window-resoltuion-width-height-in-editor-mode-programmatically/861042/3
 
 using System;
 using System.Reflection;

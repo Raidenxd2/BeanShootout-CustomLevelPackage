@@ -7,6 +7,11 @@ public class BeanShootoutConfigSO : ScriptableObject
     [Tooltip("Used for build and run.")]
     public string GamePath;
 
+    public bool FullscreenWhenTheresNoOtherPlayers = false;
+    public bool ShowMinimap = true;
+    public int MaxAmmo = 50;
+    public int MaxPlayers = 4;
+
     public bool IsValid;
     public string ValidReason;
 }
@@ -17,12 +22,20 @@ public class BeanShootoutConfigSO_Inspector : Editor
     private BeanShootoutConfigSO config;
 
     private SerializedProperty GamePath;
+    private SerializedProperty FullscreenWhenTheresNoOtherPlayers;
+    private SerializedProperty ShowMinimap;
+    private SerializedProperty MaxAmmo;
+    private SerializedProperty MaxPlayers;
 
     private void OnEnable()
     {
         config = (BeanShootoutConfigSO)target;
 
         GamePath = serializedObject.FindProperty("GamePath");
+        FullscreenWhenTheresNoOtherPlayers = serializedObject.FindProperty("FullscreenWhenTheresNoOtherPlayers");
+        ShowMinimap = serializedObject.FindProperty("ShowMinimap");
+        MaxAmmo = serializedObject.FindProperty("MaxAmmo");
+        MaxPlayers = serializedObject.FindProperty("MaxPlayers");
     }
 
     public override void OnInspectorGUI()
@@ -37,7 +50,7 @@ public class BeanShootoutConfigSO_Inspector : Editor
         }
         GUILayout.EndHorizontal();
 
-        if (GUILayout.Button("Update"))
+        if (GUILayout.Button("Validate Game Path"))
         {
             serializedObject.ApplyModifiedProperties();
 
@@ -75,6 +88,19 @@ public class BeanShootoutConfigSO_Inspector : Editor
             config.IsValid = true;
             config.ValidReason = "";
         }
+
+        GUILayout.Space(10);
+
+        EditorGUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        GUILayout.Label("Game Settings", EditorStyles.boldLabel);
+        GUILayout.FlexibleSpace();
+        EditorGUILayout.EndHorizontal();
+        
+        EditorGUILayout.PropertyField(FullscreenWhenTheresNoOtherPlayers);
+        EditorGUILayout.PropertyField(ShowMinimap);
+        EditorGUILayout.PropertyField(MaxAmmo);
+        EditorGUILayout.PropertyField(MaxPlayers);
 
         serializedObject.ApplyModifiedProperties();
     }

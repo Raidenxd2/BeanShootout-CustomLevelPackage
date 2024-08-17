@@ -105,14 +105,21 @@ public class Build : EditorWindow
             AssetDatabase.Refresh();
         }
 
+        if (AssetImporter.GetAtPath("Assets/Levels/" + SceneName + "/image.png").assetBundleName != SceneName.ToLower() + "_info")
+        {
+            AssetImporter.GetAtPath("Assets/Levels/" + SceneName + "/image.png").assetBundleName = SceneName.ToLower() + "_info";
+            AssetImporter.GetAtPath("Assets/Levels/" + SceneName + "/name.txt").assetBundleName = SceneName.ToLower() + "_info";
+        }
+
         Directory.CreateDirectory("Assets/Levels/" + SceneName + "/" + BuildPathName);
         AssetDatabase.Refresh();
 
-        AssetBundleUtils.BuildAssetBundlesByName(new[] { SceneName + "_ab" }, "Assets/Levels/" + SceneName + "/" + BuildPathName, target, ct);
+        AssetBundleUtils.BuildAssetBundlesByName(new[] { SceneName.ToLower() + "_ab", SceneName.ToLower() + "_info" }, "Assets/Levels/" + SceneName + "/" + BuildPathName, target, ct);
 
         EditorUtility.DisplayProgressBar("The Great Bean Shootout Custom Level Package", "Finishing build...", 0);
 
-        File.Move("Assets/Levels/" + SceneName + "/" + BuildPathName + "/" + SceneName.ToLower() + "_ab", "Assets/Levels/" + SceneName + "/level");
+        File.Move("Assets/Levels/" + SceneName + "/" + BuildPathName + "/" + SceneName.ToLower() + "_ab", "Assets/Levels/" + SceneName + "/level_data.bundle");
+        File.Move("Assets/Levels/" + SceneName + "/" + BuildPathName + "/" + SceneName.ToLower() + "_info", "Assets/Levels/" + SceneName + "/level_info.bundle");
         AssetDatabase.Refresh();
 
         Directory.Delete("Assets/Levels/" + SceneName + "/" + BuildPathName, true);
@@ -121,14 +128,13 @@ public class Build : EditorWindow
         Directory.CreateDirectory("Assets/Levels/" + SceneName + "/" + BuildPathName);
         AssetDatabase.Refresh();
 
-        File.Move("Assets/Levels/" + SceneName + "/level", "Assets/Levels/" + SceneName + "/" + BuildPathName + "/level");
-        File.Copy("Assets/Levels/" + SceneName + "/image.png", "Assets/Levels/" + SceneName + "/" + BuildPathName + "/image.png");
-        File.Copy("Assets/Levels/" + SceneName + "/name.txt", "Assets/Levels/" + SceneName + "/" + BuildPathName + "/name.txt");
+        File.Move("Assets/Levels/" + SceneName + "/level_data.bundle", "Assets/Levels/" + SceneName + "/" + BuildPathName + "/level_data.bundle");
+        File.Move("Assets/Levels/" + SceneName + "/level_info.bundle", "Assets/Levels/" + SceneName + "/" + BuildPathName + "/level_info.bundle");
         AssetDatabase.Refresh();
 
         EditorUtility.ClearProgressBar();
 
-        EditorUtility.DisplayDialog("Message", "Build created under Assets/Levels/" + SceneName + "/" + BuildPathName + "/level", "OK");
+        EditorUtility.DisplayDialog("Message", "Build created under Assets/Levels/" + SceneName + "/" + BuildPathName + "/", "OK");
     }
 
     private void BuildAssetBundle(CompressionType ct, BuildTarget target, string SceneName, string BuildPathName)

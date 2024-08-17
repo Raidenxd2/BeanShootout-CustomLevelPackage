@@ -23,7 +23,7 @@ public class Build : EditorWindow
 
         GUILayout.Space(50);
 
-        GUILayout.Label("The built files will be under Assets/Levels/<LEVEL NAME>/Build/level");
+        GUILayout.Label("The built files will be under Assets/Levels/<LEVEL NAME>/Build/level", EditorStyles.wordWrappedLabel);
 
         if (GUILayout.Button("Build for Windows"))
         {

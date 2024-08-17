@@ -15,7 +15,7 @@ public class Publishing : EditorWindow
 
     private void OnGUI()
     {
-        GUILayout.Label("The Zip will be created under Assets/Levels/<LEVEL NAME>/Build/<LEVEL NAME>.zip");
+        GUILayout.Label("The Zip will be created under Assets/Levels/<LEVEL NAME>/Build/<LEVEL NAME>.zip", EditorStyles.wordWrappedLabel);
 
         if (GUILayout.Button("Create Zip for Windows x64"))
         {

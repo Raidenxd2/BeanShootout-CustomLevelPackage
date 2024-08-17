@@ -108,7 +108,7 @@ public class Build : EditorWindow
         Directory.CreateDirectory("Assets/Levels/" + SceneName + "/" + BuildPathName);
         AssetDatabase.Refresh();
 
-        BuildAssetBundle(ct, target, SceneName, BuildPathName);
+        AssetBundleUtils.BuildAssetBundlesByName(new[] { SceneName + "_ab" }, "Assets/Levels/" + SceneName + "/" + BuildPathName, target, ct);
 
         EditorUtility.DisplayProgressBar("The Great Bean Shootout Custom Level Package", "Finishing build...", 0);
 

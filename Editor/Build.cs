@@ -91,6 +91,83 @@ public class Build : EditorWindow
 
             BuildLevel(ct, BuildTarget.Android, "AndroidBuild");
         }
+
+        GUILayout.Space(25);
+
+        if (GUILayout.Button("Cleanup build folders for all levels"))
+        {
+            if (EditorUtility.DisplayDialog("Question", "Are you sure you want to cleanup build folders for all levels?\nThis will delete all built files.", "Yes", "No"))
+            {
+                Debug.Log("(BeanShootout) Cleaning build folders");
+                EditorUtility.DisplayProgressBar("The Great Bean Shootout Custom Level Package", "Cleaning build folders...", 0);
+
+                string[] levelDirs = Directory.GetDirectories("Assets/Levels");
+                foreach (var item in levelDirs)
+                {
+                    if (Directory.Exists(item + "/WindowsBuild"))
+                    {
+                        File.Delete(item + "/WindowsBuild.meta");
+                        Directory.Delete(item + "/WindowsBuild", true);
+                    }
+                    if (Directory.Exists(item + "/MacBuild"))
+                    {
+                        File.Delete(item + "/MacBuild.meta");
+                        Directory.Delete(item + "/MacBuild", true);
+                    }
+                    if (Directory.Exists(item + "/LinuxBuild"))
+                    {
+                        File.Delete(item + "/LinuxBuild.meta");
+                        Directory.Delete(item + "/LinuxBuild", true);
+                    }
+                    if (Directory.Exists(item + "/AndroidBuild"))
+                    {
+                        File.Delete(item + "/AndroidBuild.meta");
+                        Directory.Delete(item + "/AndroidBuild", true);
+                    }
+
+                    AssetDatabase.Refresh();
+
+                }
+
+                EditorUtility.ClearProgressBar();
+            }
+        }
+
+        if (GUILayout.Button("Cleanup build folders for the current level"))
+        {
+            if (EditorUtility.DisplayDialog("Question", "Are you sure you want to cleanup build folders for the current level?\nThis will delete all built files.", "Yes", "No"))
+            {
+                Debug.Log("(BeanShootout) Cleaning build folders");
+                EditorUtility.DisplayProgressBar("The Great Bean Shootout Custom Level Package", "Cleaning build folders...", 0);
+
+                string item = "Assets/Levels/" + EditorSceneManager.GetActiveScene().name;
+
+                if (Directory.Exists(item + "/WindowsBuild"))
+                {
+                    File.Delete(item + "/WindowsBuild.meta");
+                    Directory.Delete(item + "/WindowsBuild", true);
+                }
+                if (Directory.Exists(item + "/MacBuild"))
+                {
+                    File.Delete(item + "/MacBuild.meta");
+                    Directory.Delete(item + "/MacBuild", true);
+                }
+                if (Directory.Exists(item + "/LinuxBuild"))
+                {
+                    File.Delete(item + "/LinuxBuild.meta");
+                    Directory.Delete(item + "/LinuxBuild", true);
+                }
+                if (Directory.Exists(item + "/AndroidBuild"))
+                {
+                    File.Delete(item + "/AndroidBuild.meta");
+                    Directory.Delete(item + "/AndroidBuild", true);
+                }
+
+                AssetDatabase.Refresh();
+
+                EditorUtility.ClearProgressBar();
+            }
+        }
     }
 
     private void BuildLevel(CompressionType ct, BuildTarget target, string BuildPathName)

@@ -38,6 +38,7 @@ public class Setup : EditorWindow
                 
                 Directory.CreateDirectory("Assets/Levels");
 
+                File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/AudioManager.asset", Application.dataPath + "/../ProjectSettings/AudioManager.asset", true);
                 File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/DynamicsManager.asset", Application.dataPath + "/../ProjectSettings/DynamicsManager.asset", true);
                 File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/GraphicsSettings.asset", Application.dataPath + "/../ProjectSettings/GraphicsSettings.asset", true);
                 File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/InputManager.asset", Application.dataPath + "/../ProjectSettings/InputManager.asset", true);

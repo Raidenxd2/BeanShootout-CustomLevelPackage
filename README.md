@@ -1,1 +1,1 @@
-Unity version: 6000.0.11f1 (Unity 6 Preview)
+Unity version: 6000.0.34f1 (Unity 6)

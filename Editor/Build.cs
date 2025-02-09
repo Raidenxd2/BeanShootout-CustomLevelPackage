@@ -212,26 +212,6 @@ public class Build : EditorWindow
 
         EditorUtility.DisplayDialog("Message", "Build created under Assets/Levels/" + SceneName + "/" + BuildPathName + "/", "OK");
     }
-
-    private void BuildAssetBundle(CompressionType ct, BuildTarget target, string SceneName, string BuildPathName)
-    {
-        switch (ct)
-        {
-            case CompressionType.None:
-                BuildPipeline.BuildAssetBundles("Assets/Levels/" + SceneName + "/" + BuildPathName, BuildAssetBundleOptions.UncompressedAssetBundle, target);
-                break;
-
-            case CompressionType.LZ4:
-                BuildPipeline.BuildAssetBundles("Assets/Levels/" + SceneName + "/" + BuildPathName, BuildAssetBundleOptions.ChunkBasedCompression, target);
-                break;
-
-            case CompressionType.LZMA:
-                BuildPipeline.BuildAssetBundles("Assets/Levels/" + SceneName + "/" + BuildPathName, BuildAssetBundleOptions.None, target);
-                break;
-        }
-
-        AssetDatabase.Refresh();
-    }
 }
 
 public enum CompressionType

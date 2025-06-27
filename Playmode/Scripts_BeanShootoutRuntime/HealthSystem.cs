@@ -59,8 +59,12 @@ namespace KillItMyself.Runtime
                 }
 
                 Dead = true;
-                
+
+#if UNITY_6000_0_OR_NEWER
                 playerRb.linearVelocity = Vector3.zero;
+#else
+                playerRb.velocity = Vector3.zero;
+#endif
 
                 playerRb.position += new Vector3(0, 0.25f, 0);
             }

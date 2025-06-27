@@ -80,11 +80,19 @@ namespace KillItMyself.Runtime
             // Handle drag
             if (grounded)
             {
+#if UNITY_6000_0_OR_NEWER
                 rb.linearDamping = groundDrag;
+#else
+                rb.drag = groundDrag;
+#endif
             }
             else
             {
+#if UNITY_6000_0_OR_NEWER
                 rb.linearDamping = 0;
+#else
+                rb.drag = 0;
+#endif
             }
         }
 
@@ -148,20 +156,32 @@ namespace KillItMyself.Runtime
 
         private void SpeedControl()
         {
+#if UNITY_6000_0_OR_NEWER
             Vector3 flatVel = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+#else
+            Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+#endif
 
             // Limit velocity if needed
             if (flatVel.magnitude > moveSpeed)
             {
                 Vector3 limitedVel = flatVel.normalized * moveSpeed;
+#if UNITY_6000_0_OR_NEWER
                 rb.linearVelocity = new Vector3(limitedVel.x, rb.linearVelocity.y, limitedVel.z);
+#else
+                rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
+#endif
             }
         }
 
         public void Jump()
         {
             //Reset Y velocity
+#if UNITY_6000_0_OR_NEWER
             rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
+#else
+            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+#endif
 
             rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
         }

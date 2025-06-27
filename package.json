@@ -3,7 +3,7 @@
   "version": "0.6.9",
   "displayName": "The Great Bean Shootout Custom Levels Package",
   "description": "The Great Bean Shootout Custom Levels Package\n\nGame Version: 1.0.0 (unreleased)",
-  "unity": "2022.0",
+  "unity": "2022.1",
   "dependencies": {
     "com.unity.render-pipelines.universal": "14.0.12",
     "com.unity.inputsystem": "1.11.2",

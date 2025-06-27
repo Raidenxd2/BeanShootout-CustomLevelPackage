@@ -38,14 +38,10 @@ public class Setup : EditorWindow
                 
                 Directory.CreateDirectory("Assets/Levels");
 
-                File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/AudioManager.asset", Application.dataPath + "/../ProjectSettings/AudioManager.asset", true);
                 File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/DynamicsManager.asset", Application.dataPath + "/../ProjectSettings/DynamicsManager.asset", true);
                 File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/GraphicsSettings.asset", Application.dataPath + "/../ProjectSettings/GraphicsSettings.asset", true);
-                File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/InputManager.asset", Application.dataPath + "/../ProjectSettings/InputManager.asset", true);
                 File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/Physics2DSettings.asset", Application.dataPath + "/../ProjectSettings/Physics2DSettings.asset", true);
                 File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/TagManager.asset", Application.dataPath + "/../ProjectSettings/TagManager.asset", true);
-                File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/TimelineSettings.asset", Application.dataPath + "/../ProjectSettings/TimelineSettings.asset", true);
-                File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/TimeManager.asset", Application.dataPath + "/../ProjectSettings/TimeManager.asset", true);
                 File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/URPProjectSettings.asset", Application.dataPath + "/../ProjectSettings/URPProjectSettings.asset", true);
                 File.Copy("Packages/com.onewing.beanshootout-customlevels/Editor/Setup/ProjectSettings~/QualitySettings.asset", Application.dataPath + "/../ProjectSettings/QualitySettings.asset", true);
 

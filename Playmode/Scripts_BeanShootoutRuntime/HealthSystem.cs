@@ -1,4 +1,5 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
@@ -27,6 +28,14 @@ namespace KillItMyself.Runtime
 
         public int Health = 100;
         private int PreviousHealth = 100;
+
+        [SerializeField] private TMP_Text DeathQuoteText;
+        [SerializeField] private string[] DeathQuotes;
+
+        private bool StopGoingUp;
+        private bool CanRespawn;
+
+        private LayerMask OldLayerMask;
 
         private void Awake()
         {
@@ -75,26 +84,63 @@ namespace KillItMyself.Runtime
             DeadUI.SetActive(false);
         }
 
+        public void ReAlive()
+        {
+            Health = 100;
+
+            if (playerInput.devices[0].displayName.Contains("Mouse"))
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+
+            Dead = false;
+
+            PlayerCamera.GetComponent<PlayerCam>().enabled = true;
+
+            PlayerCamera.GetComponent<Camera>().cullingMask = OldLayerMask;
+
+            playerRb.detectCollisions = true;
+            playerRb.useGravity = true;
+
+            StopGoingUp = false;
+            CanRespawn = false;
+
+            // if (SpawnManager.instance != null)
+            // {
+            //     playerRb.position = SpawnManager.instance.SpawnPoints[Random.Range(0, SpawnManager.instance.SpawnPoints.Length)].position;
+            // }
+            // else
+            // {
+                playerRb.position = Vector3.zero;
+            // }
+
+            FadeAnim.Play("PlayerYouWEODied_Reset");
+        }
+
         private IEnumerator DeadWait()
         {
-            PlayerPrefs.SetInt("KillABean", 1);
+            DeathQuoteText.text = DeathQuotes[Random.Range(0, DeathQuotes.Length)];
 
             yield return new WaitForSeconds(5f);
             FadeAnim.Play("PlayerYouWEODied");
 
             yield return new WaitForSeconds(1.5f);
             PlayerCamera.GetComponent<PlayerCam>().enabled = false;
-            PlayerCamera.GetComponent<MoveCamera>().enabled = false;
+
+            OldLayerMask = PlayerCamera.GetComponent<Camera>().cullingMask;
             PlayerCamera.GetComponent<Camera>().cullingMask = layerMask;
-            PlayerCamera.GetComponent<UniversalAdditionalCameraData>().renderPostProcessing = false;
+
+            playerRb.useGravity = false;
+
+            StopGoingUp = true;
+            CanRespawn = true;
 
             if (playerInput.devices[0].displayName.Contains("Mouse"))
             {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
             }
-
-            Destroy(gameObject);
         }
     }
 }

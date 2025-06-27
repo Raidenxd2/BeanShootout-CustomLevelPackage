@@ -35,9 +35,15 @@ namespace KillItMyself.Runtime
                 sensX = 225;
                 sensY = 225;
             }
+
+            if (playerControls.devices[0].displayName.Contains("Keyboard") || playerControls.devices[0].displayName.Contains("Mouse"))
+            {
+                sensX = 10;
+                sensY = 10;
+            }
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (!canMoveCamera)
             {
@@ -46,8 +52,8 @@ namespace KillItMyself.Runtime
 
             Vector2 rotateDirection = playerControls.actions["Camera"].ReadValue<Vector2>();
 
-            yRotation += rotateDirection.x * sensX * Time.deltaTime;
-            xRotation -= rotateDirection.y * sensY * Time.deltaTime;
+            yRotation += rotateDirection.x * sensX * Time.fixedDeltaTime;
+            xRotation -= rotateDirection.y * sensY * Time.fixedDeltaTime;
             xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
             //Rotate camera and orientation

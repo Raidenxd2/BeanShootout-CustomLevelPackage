@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 using Debug = UnityEngine.Debug;
 public class Build : EditorWindow
@@ -59,9 +61,8 @@ public class Build : EditorWindow
             string LevelLocalBuildFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "AppData", "LocalLow", "OneWing", "The Great Bean Shootout", "Mods", "LevelLocalBuild") + "\\";
             Debug.Log("(BeanShootout) LevelLocalBuildFolder: "+ LevelLocalBuildFolder);
 
-            File.Copy("Assets/Levels/" + SceneName + "/WindowsBuild/level", LevelLocalBuildFolder + "level", true);
-            File.Copy("Assets/Levels/" + SceneName + "/WindowsBuild/image.png", LevelLocalBuildFolder + "image.png", true);
-            File.Copy("Assets/Levels/" + SceneName + "/WindowsBuild/name.txt", LevelLocalBuildFolder + "name.txt", true);
+            File.Copy("Assets/Levels/" + SceneName + "/WindowsBuild/level_data.bundle", LevelLocalBuildFolder + "level_data.bundle", true);
+            File.Copy("Assets/Levels/" + SceneName + "/WindowsBuild/level_info.bundle", LevelLocalBuildFolder + "level_info.bundle", true);
 
             Process GameProcess = new();
             GameProcess.StartInfo.FileName = config.GamePath + "/BeanShootout.exe";
@@ -172,6 +173,29 @@ public class Build : EditorWindow
     private void BuildLevel(CompressionType ct, BuildTarget target, string BuildPathName)
     {
         EditorUtility.DisplayProgressBar("The Great Bean Shootout Custom Level Package", "Preparing build...", 0);
+
+        if (target == BuildTarget.StandaloneWindows || target == BuildTarget.StandaloneWindows64)
+        {
+            GraphicsDeviceType[] requiredGDT = new GraphicsDeviceType[] {GraphicsDeviceType.Direct3D11, GraphicsDeviceType.Direct3D12, GraphicsDeviceType.Vulkan};
+            if (!PlayerSettings.GetGraphicsAPIs(BuildTarget.StandaloneWindows64).Contains(GraphicsDeviceType.Direct3D11) || !PlayerSettings.GetGraphicsAPIs(BuildTarget.StandaloneWindows64).Contains(GraphicsDeviceType.Direct3D12) || !PlayerSettings.GetGraphicsAPIs(BuildTarget.StandaloneWindows64).Contains(GraphicsDeviceType.Vulkan))
+            {
+                if (EditorUtility.DisplayDialog("The Great Bean Shootout Custom Level Package", "The GraphicsAPI setting for Windows are not set to the required values (Direct3D 11, Direct3D 12, and Vulkan). You must support these GraphicsAPIs. Do you want to configure them automatically?", "Yes", "No"))
+                {
+                    PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.StandaloneWindows, false);
+                    PlayerSettings.SetUseDefaultGraphicsAPIs(BuildTarget.StandaloneWindows64, false);
+                    PlayerSettings.SetGraphicsAPIs(BuildTarget.StandaloneWindows64, requiredGDT);
+                    PlayerSettings.SetGraphicsAPIs(BuildTarget.StandaloneWindows, requiredGDT);
+                }
+                else
+                {
+                    EditorUtility.ClearProgressBar();
+
+                    Debug.LogError("(Build) Build Failed: The GraphicsAPI setting for Windows are not set to the required values.");
+
+                    return;
+                }
+            }
+        }
 
         string SceneName = EditorSceneManager.GetActiveScene().name;
 

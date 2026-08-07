@@ -211,6 +211,18 @@ public class Build : EditorWindow
         File.Move("Assets/Levels/" + SceneName + "/level_data.bundle", "Assets/Levels/" + SceneName + "/" + BuildPathName + "/level_data.bundle");
         File.Move("Assets/Levels/" + SceneName + "/level_info.bundle", "Assets/Levels/" + SceneName + "/" + BuildPathName + "/level_info.bundle");
 
+        string unityVer = Application.unityVersion;
+        string newVer = unityVer.Remove(unityVer.Length - 2);
+        newVer = newVer.Replace(".", "");
+        
+        LevelMetadata metadata = new()
+        {
+            UnityVersion = int.Parse(newVer),
+            GameBuild = 0
+        };
+        
+        File.WriteAllText("Assets/Levels/" + SceneName + "/" + BuildPathName + "/level_metadata.json", JsonUtility.ToJson(metadata));
+
         AssetDatabase.Refresh();
 
         EditorDialog.DisplayAlertDialog(Constants.PackageName, string.Format(Strings.Build_Finished, "Assets/Levels/" + SceneName + "/" + BuildPathName + "/"), "OK", DialogIconType.Info);

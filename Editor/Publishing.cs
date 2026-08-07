@@ -51,6 +51,7 @@ public class Publishing : EditorWindow
             // Delete meta files
             File.Delete("Assets/Levels/" + SceneName + "/" + BuildPathName + "/level_data.bundle.meta");
             File.Delete("Assets/Levels/" + SceneName + "/" + BuildPathName + "/level_info.bundle.meta");
+            File.Delete("Assets/Levels/" + SceneName + "/" + BuildPathName + "/level_metadata.json.meta");
 
             ZipUtility.CompressFolderToZip("Assets/Levels/" + SceneName + "-" + ZipName + ".zip", null, "Assets/Levels/" + SceneName + "/" + BuildPathName);
 

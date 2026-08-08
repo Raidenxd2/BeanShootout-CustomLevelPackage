@@ -16,7 +16,6 @@ namespace KillItMyself.Runtime
         public float airMultiplier;
 
         [Header("Camera")]
-        public float fovNormal = 75f;
-        public float fovSprint = 80f;
+        public int fovSprintAddition;
     }
 }

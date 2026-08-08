@@ -18,5 +18,15 @@ namespace KillItMyself.Runtime
         public bool ShootBackwards;
         public float RecoilSpeed = 3;
         public Vector3 RecoilRot = new(0, 0, 25);
+        public GunSoundType SoundType;
+    }
+
+    public enum GunSoundType
+    {
+        Shotgun,
+        Sniper,
+        Pistol,
+        Rifle,
+        Karma
     }
 }

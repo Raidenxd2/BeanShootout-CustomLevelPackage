@@ -22,3 +22,4 @@ MonoBehaviour:
   ShootBackwards: 0
   RecoilSpeed: 6
   RecoilRot: {x: -0.03, y: 0, z: 35}
+  SoundType: 1

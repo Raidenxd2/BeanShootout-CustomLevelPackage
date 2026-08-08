@@ -306,12 +306,12 @@ namespace KillItMyself.Runtime
             {
                 if (SprintInput.IsPressed())
                 {
-                    playerCam.fieldOfView = GameSettings.MovementSettings.fovSprint;
+                    playerCam.fieldOfView = 75 + GameSettings.MovementSettings.fovSprintAddition;
                     rb.AddForce(moveDirection.normalized * (GameSettings.MovementSettings.sprintSpeed * 10f), ForceMode.Force);
                 }
                 else
                 {
-                    playerCam.fieldOfView = GameSettings.MovementSettings.fovNormal;
+                    playerCam.fieldOfView = 75;
                     rb.AddForce(moveDirection.normalized * (GameSettings.MovementSettings.moveSpeed * 10f), ForceMode.Force);
                 }
             }

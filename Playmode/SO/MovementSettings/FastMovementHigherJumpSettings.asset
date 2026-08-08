@@ -18,5 +18,4 @@ MonoBehaviour:
   jumpForce: 16
   jumpCooldown: 0.25
   airMultiplier: 0.4
-  fovNormal: 75
-  fovSprint: 80
+  fovSprintAddition: 5

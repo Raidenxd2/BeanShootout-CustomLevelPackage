@@ -218,7 +218,7 @@ public class Build : EditorWindow
         LevelMetadata metadata = new()
         {
             UnityVersion = int.Parse(newVer),
-            GameBuild = 0
+            GameBuild = 8502
         };
         
         File.WriteAllText("Assets/Levels/" + SceneName + "/" + BuildPathName + "/level_metadata.json", JsonUtility.ToJson(metadata));

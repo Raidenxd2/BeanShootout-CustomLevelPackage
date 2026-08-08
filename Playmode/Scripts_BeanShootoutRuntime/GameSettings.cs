@@ -4,28 +4,23 @@ namespace KillItMyself.Runtime
 {
     public static class GameSettings
     {
-#if KILLITMYSELF_FULL
-        //[CommandLineArgument("gs_ma", "Sets 'Max Ammo' (Game Settings)")]
-#endif
         public static int MaxAmmo = 75;
-#if KILLITMYSELF_FULL
-        //[CommandLineArgument("gs_sm", "Sets 'Show Minimap' (Game Settings)")]
-#endif
         public static bool ShowMinimap = true;
 
-#if KILLITMYSELF_FULL
-        //[CommandLineArgument("gs_mp", "Sets 'Max Players' (Game Settings)")]
-#endif
         public static int MaxPlayers = 4;
-#if KILLITMYSELF_FULL
-        //[CommandLineArgument("gs_fnop", "Sets 'Full screen when theres no other players' (Game Settings)")]
-#endif
         public static bool FullscreenNoOtherPlayers;
 
-#if KILLITMYSELF_FULL
-        //[CommandLineArgument("gs_sa", "Sets 'Share ammo between all players' (Game Settings)")]
-#endif
         public static bool SharedAmmo;
+        public static bool AllowRespawning = true;
+
+        public static bool Timer;
+        public static int Time = 60;
+        
+        // Online secrets
+        public static bool AllowSecretInteractions;
+        public static bool Hotel_MassiveDoor;
+        public static bool Hotel_Elevator;
+        public static bool MoonbaseBeta_SlidingDoor;
 
         public static PlayerMovementSettingsSO MovementSettings;
         public static int MovementSettingsIndex;
@@ -39,8 +34,11 @@ namespace KillItMyself.Runtime
             MaxPlayers = 4;
             FullscreenNoOtherPlayers = false;
             SharedAmmo = false;
+            AllowRespawning = true;
             MovementSettings = null;
             MovementSettingsIndex = 0;
+            Timer = false;
+            Time = 60;
         }
 #endif
     }

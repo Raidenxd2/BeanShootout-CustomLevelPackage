@@ -1,3 +1,4 @@
+using SerialPackage.Runtime;
 using Unity.Netcode;
 
 namespace KillItMyself.Runtime
@@ -7,6 +8,7 @@ namespace KillItMyself.Runtime
         public static CurrentPlayer instance;
 
         public PlayerMovement playerMovement;
+        public HealthSystem healthSystem;
         public BulletManager bulletManager;
         public PlayerCam playerCam;
 
@@ -21,8 +23,12 @@ namespace KillItMyself.Runtime
 
         private new void OnDestroy()
         {
+            if (IsOwner)
+            {
+                instance = null;
+            }
+            
             base.OnDestroy();
-            instance = null;
         }
     }
 }

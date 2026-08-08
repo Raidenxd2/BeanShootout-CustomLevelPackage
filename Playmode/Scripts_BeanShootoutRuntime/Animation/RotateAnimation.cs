@@ -1,24 +1,16 @@
 using UnityEngine;
 
-namespace KillItMyself.Runtime.Animation
+namespace KillItMyself.Runtime
 {
     public class RotateAnimation : MonoBehaviour
     {
         [SerializeField] private TransformType transformType;
         [SerializeField] private Vector3 RotateAngle;
 
-        [Tooltip("For compatibility reasons")]
-        [SerializeField] private bool ForceZAt300 = true;
-
         private RectTransform rt;
 
         private void Start()
         {
-            if (ForceZAt300)
-            {
-                RotateAngle = new(0, 0, 300);
-            }
-            
             if (transformType == TransformType.RectTransform)
             {
                 rt = GetComponent<RectTransform>();

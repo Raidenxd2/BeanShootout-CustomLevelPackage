@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using KillItMyself.Independent;
+using KillItMyself.Runtime;
 using UnityEditor.SceneManagement;
 
 public class LevelUpdater

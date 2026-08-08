@@ -13,20 +13,15 @@ namespace KillItMyself.Runtime
 
         public bool HideCursorImage;
         public bool UseSystemMouseCursor;
-
+        
         public static MouseCursor instance;
 
         private void Awake()
         {
             instance = this;
             Cursor.visible = false;
-
-#if UNITY_ANDROID
-            CursorImage.enabled = false;
-#endif
         }
 
-#if UNITY_STANDALONE || UNITY_EDITOR
         private void Update()
         {
             if (Cursor.lockState == CursorLockMode.Locked && !CursorImage.enabled)
@@ -66,10 +61,16 @@ namespace KillItMyself.Runtime
             {
                 return;
             }
+            
+            Vector2 pos = Mouse.current.position.ReadValue();
 
-            transform.position = Mouse.current.position.ReadValue();
+            if (pos.x == 0 || pos.y == 0)
+            {
+                return;
+            }
+
+            transform.position = pos;
         }
-#endif
 
         public void UpdateMouseCursorScale()
         {
@@ -79,17 +80,20 @@ namespace KillItMyself.Runtime
 
         public void UpdateMouseCursor(MouseCursorType type)
         {
-            switch (type)
+            if (CursorImage.enabled)
             {
-                case MouseCursorType.Default:
-                    CursorImage.sprite = DefaultCursor;
-                    break;
-                case MouseCursorType.NotAllowed:
-                    CursorImage.sprite = NotAllowedCursor;
-                    break;
-                case MouseCursorType.Text:
-                    CursorImage.sprite = TextCursor;
-                    break;
+                switch (type)
+                {
+                    case MouseCursorType.Default:
+                        CursorImage.sprite = DefaultCursor;
+                        break;
+                    case MouseCursorType.NotAllowed:
+                        CursorImage.sprite = NotAllowedCursor;
+                        break;
+                    case MouseCursorType.Text:
+                        CursorImage.sprite = TextCursor;
+                        break;
+                }
             }
         }
 

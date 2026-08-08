@@ -1,10 +1,7 @@
 using Cysharp.Threading.Tasks;
-#if KILLITMYSELF_FULL
-using KillItMyself.Lore.PartOne;
-using KillItMyself.Runtime.Achievements;
-#endif
 using TMPro;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
@@ -21,6 +18,8 @@ namespace KillItMyself.Runtime
         [SerializeField] private TMP_InputField CodeInput;
 
         [SerializeField] private PlayerMovement playerMovement;
+
+        [SerializeField] private AssetReference DroneDestroyBarricade;
 
         private void Start()
         {
@@ -58,7 +57,8 @@ namespace KillItMyself.Runtime
             SavingRootObject.instance.LoadingAssetRoot.SetActive(true);
             await UniTask.WaitForEndOfFrame();
 
-            await SceneManager.LoadSceneAsync(SceneNames.S_DroneDestroyBarricade, LoadSceneMode.Additive);
+            CutsceneGlobalRef.DroneDestroyBarricade = Addressables.LoadSceneAsync(DroneDestroyBarricade, LoadSceneMode.Additive);
+            await CutsceneGlobalRef.DroneDestroyBarricade;
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(SceneNames.S_DroneDestroyBarricade));
 
             await UniTask.WaitForEndOfFrame();

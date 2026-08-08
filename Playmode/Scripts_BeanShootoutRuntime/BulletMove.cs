@@ -14,8 +14,12 @@ namespace KillItMyself.Runtime
 
         private bool HasBeenDestroyed;
 
-        public NetworkVariable<int> damageOnline = new(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+        public bool IsClientSide;
+
+        public PlayerMovement from;
+
         public NetworkVariable<bool> ShootBackwardsOnline = new(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
+        public NetworkVariable<ulong> clientIdToNotShowOn = new(readPerm: NetworkVariableReadPermission.Everyone, writePerm: NetworkVariableWritePermission.Server);
 
         private void Start()
         {
@@ -25,6 +29,26 @@ namespace KillItMyself.Runtime
 
         public void FixedUpdate()
         {
+            if (IsClientSide)
+            {
+                if (ShootBackwards)
+                {
+                    rb.AddForce(-225f * -13 * -transform.forward.normalized, ForceMode.Force);
+                }
+                else
+                {
+                    rb.AddForce(225f * 13 * transform.forward.normalized, ForceMode.Force);
+                }
+
+                return;
+            }
+
+            if (OnlineManager.instance.InOnlineGame && clientIdToNotShowOn.Value == NetworkManager.Singleton.LocalClientId)
+            {
+                GetComponent<MeshRenderer>().enabled = false;
+                GetComponent<BoxCollider>().enabled = false;
+            }
+            
             if (OnlineManager.instance.InOnlineGame && !IsOwner)
             {
                 return;
@@ -53,17 +77,32 @@ namespace KillItMyself.Runtime
             
             if (collision.gameObject.CompareTag("Player"))
             {
+                if (collision.gameObject.GetComponent<PlayerMovement>() == from)
+                {
+                    return;
+                }
+                
                 if (OnlineManager.instance.InOnlineGame)
                 {
                     // HitRpc(collision);
                     HasBeenDestroyed = true;
-                    collision.gameObject.GetComponent<HealthSystem>().DamageRpc(damageOnline.Value, NetworkManager.Singleton.LocalClientId);
-                    DespawnObjectRpc();
+
+                    if (IsClientSide)
+                    {
+                        collision.gameObject.GetComponent<HealthSystem>().DamageRpc(damage, NetworkManager.Singleton.LocalClientId);
+                        
+                        Destroy(gameObject);
+                    }
+                    else
+                    {
+                        DespawnObjectRpc();
+                    }
                 }
                 else
                 {
                     HasBeenDestroyed = true;
-                    collision.gameObject.GetComponent<HealthSystem>().Health -= damage;
+                    collision.gameObject.GetComponent<HealthSystem>().Damage(damage, from);
+                    
                     Destroy(gameObject);
                 }
             }
@@ -71,8 +110,33 @@ namespace KillItMyself.Runtime
             else if (collision.gameObject.CompareTag("Bossfight/JumbotronScreen"))
             {
                 HasBeenDestroyed = true;
-                BossfightAttacks.instance.Health -= damage;
-                Destroy(gameObject);
+                if (OnlineManager.instance.InOnlineGame)
+                {
+                    if (IsClientSide)
+                    {
+                        BossfightAttacks.instance.DamageRpc(damage);
+                    }
+                }
+                else
+                {
+                    BossfightAttacks.instance.Health -= damage;
+                }
+
+                if (OnlineManager.instance.InOnlineGame)
+                {
+                    if (IsClientSide)
+                    {
+                        Destroy(gameObject);
+                    }
+                    else
+                    {
+                        DespawnObjectRpc();
+                    }
+                }
+                else
+                {
+                    Destroy(gameObject);
+                }
             }
 #endif
             else
@@ -80,7 +144,15 @@ namespace KillItMyself.Runtime
                 if (OnlineManager.instance.InOnlineGame)
                 {
                     HasBeenDestroyed = true;
-                    DespawnObjectRpc();
+
+                    if (IsClientSide)
+                    {
+                        Destroy(gameObject);
+                    }
+                    else
+                    {
+                        DespawnObjectRpc();
+                    }
                 }
                 else
                 {
@@ -114,11 +186,24 @@ namespace KillItMyself.Runtime
             
             if (OnlineManager.instance.InOnlineGame)
             {
-                GetComponent<NetworkObject>().Despawn();
+                if (this)
+                {
+                    if (IsClientSide)
+                    {
+                        Destroy(gameObject);
+                    }
+                    else if (IsSpawned)
+                    {
+                        GetComponent<NetworkObject>().Despawn();
+                    }
+                }
             }
             else
             {
-                Destroy(gameObject);
+                if (this)
+                {
+                    Destroy(gameObject);
+                }
             }
         }
 

@@ -49,7 +49,7 @@ namespace KillItMyself.Runtime
             }
         }
 
-        private async UniTaskVoid BulletReload()
+        public async UniTaskVoid BulletReload()
         {
             await UniTask.WaitForSeconds(5);
             ammo = GameSettings.MaxAmmo;

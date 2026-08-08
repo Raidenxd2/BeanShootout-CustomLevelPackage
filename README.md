@@ -2,6 +2,7 @@
 Unity version: 6000.3.8f1
 
 # Installation
+## THE BELOW INSTRUCTIONS WILL NOT WORK, please wait for https://github.com/Raidenxd2/BeanShootout-SDK-Installer to be ready
 Create a project with the 3D (Built-In Render Pipeline) template \
 Open the Package Manager (Window/Package Management/Package Manager) \
 Click the plus on the top right and click install package from Git URL... \

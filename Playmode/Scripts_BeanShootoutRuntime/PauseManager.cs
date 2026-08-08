@@ -1,12 +1,13 @@
 #if KILLITMYSELF_FULL
 using Cysharp.Threading.Tasks;
 using UnityEngine.UI;
-using com.raiden.assetbundleassetreference.Runtime;
 #endif
 using System;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace KillItMyself.Runtime
 {
@@ -20,15 +21,11 @@ namespace KillItMyself.Runtime
 
         [SerializeField] private GameObject BotPlayerPrefab;
         
-#if UNITY_EDITOR        
-        [SerializeField] private bool UseAssetBundlesInEditor;
-#endif        
-        
         [SerializeField] private Transform SettingsRootParent;
         private GameObject SettingsRoot;
 #if KILLITMYSELF_FULL
-        [SerializeField] private AssetBundleAssetReference SettingsRootRef;
-        [SerializeField] private AssetBundleAssetReference SettingsRootSharedRef;
+        [SerializeField] private AssetReference SettingsRootRef;
+        private AsyncOperationHandle<GameObject> SettingsRootHandle;
 #endif
         private AssetBundle SettingsRootSharedBundle;
         private AssetBundle SettingsRootBundle;
@@ -39,6 +36,8 @@ namespace KillItMyself.Runtime
         public CursorLockMode prevCursorLock;
         private bool prevCanMove;
 
+        public bool CanPause = true;
+
         public static PauseManager instance;
 
         private void Awake()
@@ -48,6 +47,11 @@ namespace KillItMyself.Runtime
 
         public void PauseOrUnpause()
         {
+            if (!CanPause)
+            {
+                return;
+            }
+            
             paused = !paused;
 
             if (paused)
@@ -92,31 +96,24 @@ namespace KillItMyself.Runtime
             EventSystem.current.SetSelectedGameObject(ResumeGameButton);
         }
 
-#if KILLITMYSELF_FULL
+
         public void OpenSettingsMenu()
         {
+#if KILLITMYSELF_FULL
             ShowSettingsAsync().Forget();
+#elif UNITY_EDITOR
+            UnityEditor.EditorDialog.DisplayAlertDialog("The Great Bean Shootout SDK", "You cannot access settings in the Editor. Please open the game and change settings there.", "OK", UnityEditor.DialogIconType.Warning);
+#endif
         }
 
+#if KILLITMYSELF_FULL
         private async UniTaskVoid ShowSettingsAsync()
         {
             SavingRootObject.instance.LoadingAssetRoot.SetActive(true);
             
-#if UNITY_EDITOR
-            if (!UseAssetBundlesInEditor)
-            {
-                SettingsRoot = Instantiate(UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/SettingsRoot Variant.prefab"), SettingsRootParent);
-            }
-            else
-            {
-#endif 
-                SettingsRootSharedBundle = await AssetBundle.LoadFromFileAsync(Constants.GetAssetBundleFullPathPath(SettingsRootSharedRef.BundleName));
-                SettingsRootBundle = await AssetBundle.LoadFromFileAsync(Constants.GetAssetBundleFullPathPath(SettingsRootRef.BundleName));
-
-                SettingsRoot = Instantiate(await SettingsRootBundle.LoadAssetAsync(SettingsRootRef.AssetName) as GameObject, SettingsRootParent);
-#if UNITY_EDITOR
-            }
-#endif
+            SettingsRootHandle = Addressables.LoadAssetAsync<GameObject>(SettingsRootRef);
+            await SettingsRootHandle;
+            SettingsRoot = Instantiate(SettingsRootHandle.Result, SettingsRootParent);
 
             GameObject.Find("SettingsRoot_BackButton").GetComponent<Button>().onClick.AddListener(DestroySettings);
             
@@ -125,22 +122,12 @@ namespace KillItMyself.Runtime
 
         private void DestroySettings()
         {
-            DestroySettingsAsync().Forget();
-        }
-        
-        private async UniTaskVoid DestroySettingsAsync()
-        {
             Destroy(SettingsRoot);
 
-#if UNITY_EDITOR
-            if (UseAssetBundlesInEditor)
+            if (SettingsRootHandle.IsValid())
             {
-#endif                
-                await SettingsRootBundle.UnloadAsync(true);
-                await SettingsRootSharedBundle.UnloadAsync(true);
-#if UNITY_EDITOR                
+                Addressables.Release(SettingsRootHandle);
             }
-#endif
         }
 #endif
 
@@ -173,10 +160,21 @@ namespace KillItMyself.Runtime
                 return;
             }
 
-            LoadingManager.instance.LoadScene(SceneNames.S_MainMenu, false);
+            LoadingManager.instance.LoadAddressableScene(SceneNames.S_MainMenu, SceneRefs.instance.MainMenu);
 #elif UNITY_EDITOR
             UnityEditor.EditorApplication.ExitPlaymode();
 #endif
+        }
+
+        public void EmergencyRespawn()
+        {
+            if (CurrentPlayer.instance.healthSystem.OnlineHealth.Value > 0)
+            {
+                CurrentPlayer.instance.playerMovement.rb.linearVelocity = Vector3.zero;
+                CurrentPlayer.instance.playerMovement.transform.position = Vector3.zero;
+                CurrentPlayer.instance.playerMovement.CloseShipOverrideCodeUI();
+                CurrentPlayer.instance.healthSystem.OnlineHealth.Value = 0;
+            }
         }
 
         private void Update()
@@ -189,6 +187,15 @@ namespace KillItMyself.Runtime
 
         private void OnDestroy()
         {
+            if (SettingsRootBundle)
+            {
+                SettingsRootBundle.Unload(true);
+            }
+            if (SettingsRootSharedBundle)
+            {
+                SettingsRootSharedBundle.Unload(true);
+            }
+            
             instance = null;
         }
     }

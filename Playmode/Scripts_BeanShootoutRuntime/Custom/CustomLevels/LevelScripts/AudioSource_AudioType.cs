@@ -1,7 +1,3 @@
-#if KILLITMYSELF_FULL
-using KillItMyself.Runtime.Content.Resources;
-#endif
-
 using UnityEngine;
 
 namespace KillItMyself.Runtime

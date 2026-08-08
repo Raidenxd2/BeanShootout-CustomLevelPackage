@@ -137,9 +137,11 @@ MonoBehaviour:
   rb: {fileID: 8429741553623010687}
   damage: 0
   ShootBackwards: 0
-  damageOnline:
-    m_InternalValue: 0
+  IsClientSide: 0
+  from: {fileID: 0}
   ShootBackwardsOnline:
+    m_InternalValue: 0
+  clientIdToNotShowOn:
     m_InternalValue: 0
 --- !u!65 &1223660660390337333
 BoxCollider:

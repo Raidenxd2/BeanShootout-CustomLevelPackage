@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace KillItMyself.Independent
+namespace KillItMyself.Runtime
 {
     public class GravityManager : MonoBehaviour
     {

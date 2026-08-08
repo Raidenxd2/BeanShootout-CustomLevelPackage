@@ -1,4 +1,6 @@
+using System;
 using Cysharp.Threading.Tasks;
+using SerialPackage.Runtime;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport;
@@ -15,18 +17,87 @@ namespace KillItMyself.Runtime
 
         public bool Connecting;
         public bool Disconnecting;
+        private bool Quitting;
 
         public bool IgnoreErrors;
-
-        [SerializeField] private GameObject NetworkManagerPrefab;
 
         private void Awake()
         {
             instance = this;
+
+            Application.wantsToQuit += WantsToQuit;
+        }
+
+        private bool WantsToQuit()
+        {
+            if (Application.isEditor)
+            {
+                return true;
+            }
+            
+            if (Quitting)
+            {
+                return false;
+            }
+            
+            if (InOnlineGame && NetworkManager.Singleton.IsServer)
+            {
+                Quitting = true;
+
+#if KILLITMYSELF_FULL
+                WantsToQuitAsync().Forget();
+#endif
+                
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
 #if KILLITMYSELF_FULL
-        private void Start()
+        private async UniTaskVoid WantsToQuitAsync()
+        {
+            try
+            {
+                await LoadingManager.instance.ShowLoadingScreen(true);
+
+                for (int i = 0; i < 15; i++)
+                {
+                    DisconnectPlayersRpc();
+                    await UniTask.WaitForSeconds(0.25f);
+                    
+                    BeanLogger.Log(NetworkManager.Singleton.ConnectedClients.Count.ToString(), this);
+
+                    if (NetworkManager.Singleton.ConnectedClients.Count < 2)
+                    {
+                        break;
+                    }
+                }
+                
+                NetworkManager.Singleton.Shutdown();
+
+                Quitting = false;
+                Disconnecting = true;
+                Connecting = false;
+                Host_InGame = false;
+
+                Application.Quit();
+            }
+            catch (Exception ex)
+            {
+                BeanLogger.LogError("Failed to properly disconnect all players!", this);
+                Debug.LogException(ex);
+
+                Quitting = false;
+                InOnlineGame = false;
+                
+                Application.Quit();
+            }
+        }
+
+        public void InitNetworking()
         {
             NetworkManager.Singleton.OnTransportFailure += OnTransportFailure;
             NetworkManager.Singleton.OnConnectionEvent += OnConnectionEvent;
@@ -68,11 +139,13 @@ namespace KillItMyself.Runtime
                 errorString += "\n<size=25>" + UnityTransportPrevLog.prevLog + "</size>";
                 UnityTransportPrevLog.prevLog = null;
             }
+#if !UNITY_WEBGL
             if (!string.IsNullOrEmpty(DebugLogPrev.prevLog))
             {
                 errorString += "\n<size=25>" + DebugLogPrev.prevLog + "</size>";
                 DebugLogPrev.prevLog = null;
             }
+#endif
             
             Connecting = false;
 
@@ -81,22 +154,27 @@ namespace KillItMyself.Runtime
 
         public void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
         {
-            if (NetworkManager.Singleton.IsServer)
+            Uri uri = new("http://" + NetworkManager.Singleton.GetComponent<UnityTransport>().GetEndpoint(request.ClientNetworkId).Address);
+            
+            if (CommandLineArgs.VerboseLoggingEnabled)
             {
-                response.Approved = true;
+                BeanLogger.Log("Client IP " + uri.Host + " is connecting!", this);
             }
 
-            if (CurrentBannedPlayers.current.playerUniques.Contains(request.Payload.ToString()))
+            foreach (var player in CurrentBannedPlayers.current.players)
             {
-                response.Approved = false;
-                response.Reason = "You were kicked from the server: You have been permanently banned from this server.";
-                return;
+                if (player.unique == request.Payload.ToString() || player.ip == uri.Host)
+                {
+                    response.Approved = false;
+                    response.Reason = "Banned";
+                    return;
+                }
             }
 
             if (Host_InGame)
             {
                 response.Approved = false;
-                response.Reason = "You were kicked from the server: Cannot join in progress game.";
+                response.Reason = "InProgress";
                 return;
             }
 
@@ -104,6 +182,7 @@ namespace KillItMyself.Runtime
             response.PlayerPrefabHash = null;
             response.Position = Vector3.zero;
             response.Rotation = Quaternion.identity;
+            response.Approved = true;
             response.Pending = false;
         }
 
@@ -125,8 +204,6 @@ namespace KillItMyself.Runtime
                 return;
             }
 
-            OnlineSceneManagement.instance.Stop();
-
             BeanLogger.LogWarning("Host left.", this);
 
             Destroy(GameObject.Find("PlayerInput(Clone)"));
@@ -142,11 +219,9 @@ namespace KillItMyself.Runtime
 
             NetworkManager.Singleton.Shutdown();
 
-            OnlineSceneManagement.instance.Stop();
-
             Destroy(GameObject.Find("PlayerInput(Clone)"));
 
-            LoadingManager.instance.LoadScene(SceneNames.S_MainMenu, false);
+            LoadingManager.instance.LoadAddressableScene(SceneNames.S_MainMenu, SceneRefs.instance.MainMenu);
         }
 
         private void OnConnectionEvent(NetworkManager manager, ConnectionEventData data)
@@ -214,18 +289,24 @@ namespace KillItMyself.Runtime
             Destroy(GameObject.Find("PlayerInput(Clone)"));
             
             BeanLogger.Log(NetworkManager.Singleton.DisconnectReason, this);
-
-            if (Connecting)
-            {
-                NetworkErrorManager.instance.ShowErrorAndDisconnect(await LocalizedStringReferences.instance.Online_FailedToConnect.GetLocalizedStringAsync());
-                return;
-            }
             
             if (!string.IsNullOrEmpty(NetworkManager.Singleton.DisconnectReason))
             {
                 if (NetworkManager.Singleton.DisconnectReason.Equals("SyncError"))
                 {
                     NetworkErrorManager.instance.ShowErrorAndDisconnect(await LocalizedStringReferences.instance.Online_FailedToSyncData.GetLocalizedStringAsync());
+                }
+                else if (NetworkManager.Singleton.DisconnectReason.Equals("AntiCheatKick"))
+                {
+                    NetworkErrorManager.instance.ShowErrorAndDisconnect(await LocalizedStringReferences.instance.Online_AntiCheatKick.GetLocalizedStringAsync());
+                }
+                else if (NetworkManager.Singleton.DisconnectReason.Equals("VRNotAllowed"))
+                {
+                    NetworkErrorManager.instance.ShowErrorAndDisconnect(await LocalizedStringReferences.instance.Online_VRNotAllowed.GetLocalizedStringAsync());
+                }
+                else if (NetworkManager.Singleton.DisconnectReason.Equals("Banned"))
+                {
+                    NetworkErrorManager.instance.ShowErrorAndDisconnect(await LocalizedStringReferences.instance.Online_Banned.GetLocalizedStringAsync());
                 }
                 else
                 {
@@ -234,6 +315,12 @@ namespace KillItMyself.Runtime
             }
             else
             {
+                if (Connecting)
+                {
+                    NetworkErrorManager.instance.ShowErrorAndDisconnect(await LocalizedStringReferences.instance.Online_FailedToConnect.GetLocalizedStringAsync());
+                    return;
+                }
+                
                 NetworkErrorManager.instance.ShowErrorAndDisconnect(await LocalizedStringReferences.instance.Online_HostLeft.GetLocalizedStringAsync());
             }
         }

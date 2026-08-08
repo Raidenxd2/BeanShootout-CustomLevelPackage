@@ -1,10 +1,8 @@
 using Cysharp.Threading.Tasks;
-#if KILLITMYSELF_FULL
-using KillItMyself.Lore.PartOne;
-using KillItMyself.Runtime.Achievements;
-#endif
+using SerialPackage.Runtime;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
@@ -38,6 +36,8 @@ namespace KillItMyself.Runtime
         [SerializeField] private AchievementSO UnderTheSurfaceAchievement;
         [SerializeField] private AchievementSO BilingualAchievement;
 #endif
+
+        [SerializeField] private AssetReference EnterCodeCutsceneShip;
 
         private void Start()
         {
@@ -152,6 +152,8 @@ namespace KillItMyself.Runtime
                     
                     playerMovement.LetPlayerDoAnything();
                     Cursor.lockState = CursorLockMode.Locked;
+                    
+                    InputButtonMoonbaseBetaAsync().Forget();
                 }
             }
             else
@@ -173,6 +175,17 @@ namespace KillItMyself.Runtime
         }
 
 #if KILLITMYSELF_FULL
+        private async UniTaskVoid InputButtonMoonbaseBetaAsync()
+        {
+            MoonbaseBeta_TextObjects.instance.FirstText.SetActive(false);
+            MoonbaseBeta_TextObjects.instance.SecondText.SetActive(true);
+            await UniTask.WaitForSeconds(3.892f);
+            MoonbaseBeta_TextObjects.instance.SecondText.SetActive(false);
+            MoonbaseBeta_TextObjects.instance.ThirdText.SetActive(true);
+        }
+#endif
+
+#if KILLITMYSELF_FULL
         private async UniTaskVoid InputButtonAsync()
         {
             gameObject.SetActive(false);
@@ -188,7 +201,8 @@ namespace KillItMyself.Runtime
             SavingRootObject.instance.LoadingAssetRoot.SetActive(true);
             await UniTask.WaitForEndOfFrame();
 
-            await SceneManager.LoadSceneAsync(SceneNames.S_EnterCodeCutsceneShip, LoadSceneMode.Additive);
+            CutsceneGlobalRef.EnterCodeCutsceneShip = Addressables.LoadSceneAsync(EnterCodeCutsceneShip, LoadSceneMode.Additive);
+            await CutsceneGlobalRef.EnterCodeCutsceneShip;
             SceneManager.SetActiveScene(SceneManager.GetSceneByName(SceneNames.S_EnterCodeCutsceneShip));
 
             await UniTask.WaitForEndOfFrame();

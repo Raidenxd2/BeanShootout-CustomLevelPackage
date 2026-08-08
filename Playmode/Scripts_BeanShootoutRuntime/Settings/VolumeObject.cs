@@ -64,6 +64,8 @@ namespace KillItMyself.Runtime
                     bloom.active = true;
                     break;
             }
+            
+            volume.profile.Reset();
         }
 
         private void OnDestroy()

@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 namespace KillItMyself.Runtime
 {
@@ -32,11 +34,11 @@ namespace KillItMyself.Runtime
         public List<GunSO> guns = new();
         public int currentIndex;
 
-        public Color[] colors;
+        [SerializeField] private PlayerStartUISO startUI;
         public int PlayerColorCurrentIndex;
         public int PlayerVisorColorCurrentIndex;
 
-        [SerializeField] private MeshRenderer playerRenderer;
+        public MeshRenderer playerRenderer;
         [SerializeField] private MeshRenderer playerLocationRenderer;
 
         private void Start()
@@ -46,11 +48,6 @@ namespace KillItMyself.Runtime
                 return;
             }
 
-            // if (OnlineManager.instance.InOnlineGame)
-            // {
-            //     playerControls = GlobalPlayerInput.instance.playerInput;
-            // }
-
             GetComponent<Rigidbody>().position = GameObject.Find("PlayerSpawnBox").transform.position;
 
 #if KILLITMYSELF_FULL
@@ -59,26 +56,50 @@ namespace KillItMyself.Runtime
                 guns.AddRange(CustomGunManager.ModSo);
             }
 #endif
+            
+            if (OnlineManager.instance.InOnlineGame)
+            {
+                currentIndex = BetterPrefs.GetInt("Online_Defaults_GunIndex", 0);
+                PlayerColorCurrentIndex = BetterPrefs.GetInt("Online_Defaults_PlayerColorIndex", 0);
+                PlayerVisorColorCurrentIndex = BetterPrefs.GetInt("Online_Defaults_PlayerVisorColorIndex", 0);
+            
+                GunImage.sprite = guns[currentIndex].Image;
+                GunNameText.text = guns[currentIndex].GunName;
+                PlayerColorImage.color = startUI.colors[PlayerColorCurrentIndex];
+                PlayerVisorColorImage.color = startUI.colors[PlayerVisorColorCurrentIndex];
+            }
 
-            if (playerControls.devices[0].displayName.Contains("Xbox"))
+            try
             {
-                Instantiate(XboxControllerIcons, ControllerIconsParent);
-                Instantiate(UniversalControllerIcons, ControllerIconsParent);
+                if (playerControls.devices[0].displayName.Contains("Xbox"))
+                {
+                    Instantiate(XboxControllerIcons, ControllerIconsParent);
+                    Instantiate(UniversalControllerIcons, ControllerIconsParent);
+                }
+                else if (playerControls.devices[0].displayName.Contains("DualSense"))
+                {
+                    Instantiate(PlayStationControllerIcons, ControllerIconsParent);
+                    Instantiate(UniversalControllerIcons, ControllerIconsParent);
+                }
+                else if (playerControls.devices[0].displayName.Contains("Nintendo") || playerControls.devices[0].displayName.Contains("Pro Controller") || playerControls.devices[0].name.Contains("Switch") || playerControls.devices[0].name.Contains("ProController"))
+                {
+                    Instantiate(NintendoButtons, ControllerIconsParent);
+                    Instantiate(UniversalControllerIcons, ControllerIconsParent);
+                }
+                else if (playerControls.devices[0].name.Contains("Gamepad"))
+                {
+                    // Instantiate(GenericButtons, ControllerIconsParent);
+                    Instantiate(UniversalControllerIcons, ControllerIconsParent);
+                }
             }
-            else if (playerControls.devices[0].displayName.Contains("DualSense"))
+            catch (Exception e)
             {
-                Instantiate(PlayStationControllerIcons, ControllerIconsParent);
-                Instantiate(UniversalControllerIcons, ControllerIconsParent);
+                Debug.LogException(e);
             }
-            else if (playerControls.devices[0].displayName.Contains("Nintendo") || playerControls.devices[0].displayName.Contains("Pro Controller") || playerControls.devices[0].name.Contains("Switch") || playerControls.devices[0].name.Contains("ProController"))
+
+            if (VRManager.instance.VREnabled)
             {
-                Instantiate(NintendoButtons, ControllerIconsParent);
-                Instantiate(UniversalControllerIcons, ControllerIconsParent);
-            }
-            else if (playerControls.devices[0].name.Contains("Gamepad"))
-            {
-                // Instantiate(GenericButtons, ControllerIconsParent);
-                Instantiate(UniversalControllerIcons, ControllerIconsParent);
+                VRManager.instance.FixUI().Forget();
             }
         }
 
@@ -93,13 +114,19 @@ namespace KillItMyself.Runtime
 
             recoil.UpdateValuesForCurrentGun(guns[currentIndex]);
 
-            playerRenderer.materials[0].color = colors[PlayerColorCurrentIndex];
-            playerRenderer.materials[1].color = colors[PlayerVisorColorCurrentIndex];
-            playerLocationRenderer.material.color = colors[PlayerColorCurrentIndex];
+            List<Material> mats = new();
+            playerRenderer.GetMaterials(mats);
+            
+            mats[0].color = startUI.colors[PlayerColorCurrentIndex];
+            mats[1].color = startUI.colors[PlayerVisorColorCurrentIndex];
+            playerLocationRenderer.material.color = startUI.colors[PlayerColorCurrentIndex];
 
             if (OnlineManager.instance.InOnlineGame)
             {
                 JoinGameRpc(currentIndex, PlayerColorCurrentIndex, PlayerVisorColorCurrentIndex);
+
+                playerMovement.rb.constraints = RigidbodyConstraints.None;
+                playerMovement.rb.freezeRotation = true;
             }
 
             PlayerStartUIRoot.SetActive(false);
@@ -107,11 +134,11 @@ namespace KillItMyself.Runtime
 
             if (SpawnManager.instance)
             {
-                GetComponent<Rigidbody>().position = SpawnManager.instance.SpawnPoints[Random.Range(0, SpawnManager.instance.SpawnPoints.Length)].position;
+                playerMovement.rb.position = SpawnManager.instance.SpawnPoints[Random.Range(0, SpawnManager.instance.SpawnPoints.Length)].position;
             }
             else
             {
-                GetComponent<Rigidbody>().position = Vector3.zero;
+                playerMovement.rb.position = Vector3.zero;
             }
         }
 
@@ -121,9 +148,15 @@ namespace KillItMyself.Runtime
             bullet.gun = guns[index];
             bullet.BulletManagerInit();
 
-            playerRenderer.materials[0].color = colors[playerColorIndex];
-            playerRenderer.materials[1].color = colors[playerVisorColorIndex];
-            playerLocationRenderer.material.color = colors[playerColorIndex];
+            List<Material> mats = new();
+            playerRenderer.GetMaterials(mats);
+            
+            mats[0].color = startUI.colors[playerColorIndex];
+            mats[1].color = startUI.colors[playerVisorColorIndex];
+            playerLocationRenderer.material.color = startUI.colors[playerColorIndex];
+
+            playerMovement.rb.constraints = RigidbodyConstraints.None;
+            playerMovement.rb.freezeRotation = true;
         }
 
         public void GunUp()
@@ -153,12 +186,12 @@ namespace KillItMyself.Runtime
         public void PlayerColorSelectUp()
         {
             PlayerColorCurrentIndex++;
-            if (PlayerColorCurrentIndex >= colors.Length - 1)
+            if (PlayerColorCurrentIndex >= startUI.colors.Length - 1)
             {
-                PlayerColorCurrentIndex = colors.Length - 1;
+                PlayerColorCurrentIndex = startUI.colors.Length - 1;
             }
 
-            PlayerColorImage.color = colors[PlayerColorCurrentIndex];
+            PlayerColorImage.color = startUI.colors[PlayerColorCurrentIndex];
         }
 
         public void PlayerColorSelectDown()
@@ -169,18 +202,18 @@ namespace KillItMyself.Runtime
                 PlayerColorCurrentIndex = 0;
             }
 
-            PlayerColorImage.color = colors[PlayerColorCurrentIndex];
+            PlayerColorImage.color = startUI.colors[PlayerColorCurrentIndex];
         }
 
         public void PlayerVisorColorSelectUp()
         {
             PlayerVisorColorCurrentIndex++;
-            if (PlayerVisorColorCurrentIndex >= colors.Length - 1)
+            if (PlayerVisorColorCurrentIndex >= startUI.colors.Length - 1)
             {
-                PlayerVisorColorCurrentIndex = colors.Length - 1;
+                PlayerVisorColorCurrentIndex = startUI.colors.Length - 1;
             }
 
-            PlayerVisorColorImage.color = colors[PlayerVisorColorCurrentIndex];
+            PlayerVisorColorImage.color = startUI.colors[PlayerVisorColorCurrentIndex];
         }
 
         public void PlayerVisorColorSelectDown()
@@ -191,7 +224,7 @@ namespace KillItMyself.Runtime
                 PlayerVisorColorCurrentIndex = 0;
             }
 
-            PlayerVisorColorImage.color = colors[PlayerVisorColorCurrentIndex];
+            PlayerVisorColorImage.color = startUI.colors[PlayerVisorColorCurrentIndex];
         }
 
         private void Update()
@@ -206,7 +239,7 @@ namespace KillItMyself.Runtime
                 Cursor.lockState = CursorLockMode.None;
             }
 
-            if (playerControls.actions["Jump"].WasPressedThisFrame())
+            if (playerMovement.JumpInput.WasPressedThisFrame())
             {
                 JoinGame();
             }
